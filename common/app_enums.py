@@ -1,0 +1,8 @@
+from enum import Enum
+
+class AppState(Enum):
+    RUNNING = "RUNNING"
+    SUSPENDED = "SUSPENDED"
+    ERROR = "ERROR"
+    INITIALIZING = "INITIALIZING"
+    SHUTTING_DOWN = "SHUTTING_DOWN"
