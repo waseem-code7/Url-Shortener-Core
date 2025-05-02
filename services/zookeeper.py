@@ -1,5 +1,7 @@
 from kazoo.client import KazooClient
 from kazoo.exceptions import NodeExistsError
+from kazoo.protocol.states import KazooState
+
 from common.utils import get_logger
 logger = get_logger(__name__)
 
@@ -12,18 +14,27 @@ class ZookeeperService:
             self.zkClient: KazooClient = KazooClient()
             self.__class__.initialized = True
 
-    def connect(self) -> str:
+    def connect(self):
         try:
             self.zkClient.start()
             logger.info("Connecting to ZooKeeper...")
             self.zkClient.ensure_path(self.base_path)
-            path = self.zkClient.create(path=self.base_path  + "/node-", ephemeral=True, sequence=True)
-            logger.info(f"Successfully created ephemeral sequential node at : {path}")
-            return path
-        except NodeExistsError:
-            logger.warning(f"Znode already exists at {self.base_path}")
         except Exception as e:
             logger.error(f"Error connecting to ZooKeeper: {e}")
+
+    def is_zookeeper_connected(self) -> bool:
+        return self.zkClient.state == KazooState.CONNECTED
+
+    def create_new_node(self) -> str:
+        try:
+            if self.is_zookeeper_connected():
+                path = self.zkClient.create(path=self.base_path  + "/node-", ephemeral=True, sequence=True)
+                logger.info(f"Successfully created ephemeral sequential node at : {path}")
+                return path
+        except NodeExistsError:
+            logger.error(f"Znode already exists at {self.base_path}")
+        except Exception as e:
+            logger.error(f"Error occurred while creating z-node {e}")
 
     def close_conn(self):
         try:
