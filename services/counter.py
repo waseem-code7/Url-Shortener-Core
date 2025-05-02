@@ -7,7 +7,7 @@ logger = get_logger(__name__)
 # Strict Singleton class
 class CounterService:
 
-    def __new__(cls):
+    def __new__(cls, *args, **kwargs):
         if not hasattr(cls, "instance"):
             cls.instance = super().__new__(cls)
             cls.initialized = False
@@ -51,5 +51,6 @@ class CounterService:
         path = self.zkService.create_new_node()
         self.set_counter_attributes(path)
         return self.get_counter_value_safe(retries - 1)
+
 
 
