@@ -4,6 +4,7 @@ from services.zookeeper import ZookeeperService
 
 logger = get_logger(__name__)
 
+# Strict Singleton class
 class CounterService:
 
     def __new__(cls):
