@@ -24,7 +24,7 @@ async def lifespan(app: FastAPI):
     node_config["START_COUNTER_VALUE"] = start
     node_config["END_COUNTER_VALUE"] = end
     node_config["APP_STATE"] = AppState.RUNNING
-    print(node_config)
+    
     yield
 
     node_config["APP_STATE"] = AppState.SHUTTING_DOWN
