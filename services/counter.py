@@ -1,4 +1,6 @@
 import os
+import threading
+
 from common.utils import get_logger
 from services.zookeeper import ZookeeperService
 
@@ -21,6 +23,7 @@ class CounterService:
             self._end = 0
             self.current = 0
             self.zkService = zkService
+            self.lock = threading.Lock()
 
     def set_counter_attributes(self, node_path):
         node_sequence_number = int(node_path.split("-")[-1])
@@ -41,16 +44,18 @@ class CounterService:
         if retries < 0:
             raise Exception("Unable to increment counter")
 
-        value = self.current + 1
+        # critical section
+        with self.lock:
+            value = self.current + 1
 
-        if value < self._end:
-            self.current += 1
-            return value
+            if value < self._end:
+                self.current += 1
+                return value
 
-        logger.warn("Counter Exhausted, calling zookeeper to create new ephemeral sequential node")
-        path = self.zkService.create_new_node()
-        self.set_counter_attributes(path)
-        return self.get_counter_value_safe(retries - 1)
+            logger.warn("Counter Exhausted, calling zookeeper to create new ephemeral sequential node")
+            path = self.zkService.create_new_node()
+            self.set_counter_attributes(path)
+            return self.get_counter_value_safe(retries - 1)
 
 
 
