@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request, Depends, HTTPException, Body
+from fastapi.concurrency import run_in_threadpool
 
 from dtos.RequestDTOs import CreateShortUrlRequest
 from services.ShortUrlService import ShortUrlService
@@ -20,7 +21,8 @@ def get_short_url_service(request: Request) -> ShortUrlService:
 @router.post("/v1/shorturl")
 async def create_short_url(body: CreateShortUrlRequest = Body(), short_url_service: ShortUrlService = Depends(get_short_url_service)):
     try:
-        return short_url_service.create_new_short_url(body.url)
+        short_url = await run_in_threadpool(short_url_service.create_new_short_url, body.url)
+        return short_url
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
