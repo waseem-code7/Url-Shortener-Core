@@ -4,7 +4,7 @@ from fastapi.concurrency import run_in_threadpool
 from dtos.RequestDTOs import CreateShortUrlRequest
 from services.ShortUrlService import ShortUrlService
 from services.shortener import Shortener
-from strategies.base64 import Base64Encoder
+from strategies.base62 import Base62Strategy
 from starlette import status
 
 router = APIRouter()
@@ -13,7 +13,7 @@ router = APIRouter()
 
 def get_short_url_service(request: Request) -> ShortUrlService:
     counter_service = request.app.state.counter_service
-    shortener_service = Shortener(Base64Encoder())
+    shortener_service = Shortener(Base62Strategy())
     return ShortUrlService(counter_service, shortener_service)
 
 
