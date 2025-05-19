@@ -4,3 +4,5 @@ python-dotenv~=1.1.0
 pydantic~=2.11.4
 boto3~=1.38.8
 starlette~=0.46.2
+uvicorn~=0.34.2
+mypy-boto3-dynamodb~=1.38.4
