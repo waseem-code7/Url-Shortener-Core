@@ -28,8 +28,11 @@ class KafkaProducer:
                     cls._instance = super().__new__(cls)
         return cls._instance
 
+    def poll_producer(self):
+        self.producer.poll()
 
-    async def send_message(self, topic_name: str, attributes: KafkaProducerMessage, retries=3):
+
+    def send_message(self, topic_name: str, attributes: KafkaProducerMessage, retries=3):
 
         def acked(err, msg):
             if err is not None:
@@ -44,5 +47,3 @@ class KafkaProducer:
                 logger.info("Message produced: %s" % (str(msg)))
 
         self.producer.produce(topic_name, key=attributes.get("key"), value=attributes.get("value"), callback=acked)
-
-        self.producer.poll(1)
