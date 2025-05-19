@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, Depends, HTTPException, Body
 from fastapi.concurrency import run_in_threadpool
 
 from dtos.RequestDTOs import CreateShortUrlRequest, UpdateShortUrlRequest
-from services.ShortUrlService import ShortUrlService
+from services.shortUrlService import ShortUrlService
 from services.shortener import Shortener
 from strategies.base62 import Base62Strategy
 from starlette import status

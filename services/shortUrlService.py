@@ -5,7 +5,7 @@ from services.shortener import Shortener
 from repository.shortener import ShortenerRepository
 from datetime import datetime, timezone, timedelta
 from common import utils
-logger = utils.get_logger("ShortUrlService.py")
+logger = utils.get_logger("shortUrlService.py")
 
 
 class ShortUrlService:
