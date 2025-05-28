@@ -37,7 +37,7 @@ class ShortenerRepository(DynamoDBClient):
             key_attributes = {
                 os.getenv("DYNAMO_URL_TABLE_PK", default="short_url_id"): pk
             }
-            self.delete_record(key_attributes, return_values)
+            return self.delete_record(key_attributes, return_values)
         except Exception as e:
             logger.error(f"Error occurred while deleting data from dynamo db {e}")
 
