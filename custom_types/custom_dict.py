@@ -1,5 +1,5 @@
-from typing import Dict, TypedDict
+from typing import TypedDict
 
 class KafkaProducerMessage(TypedDict):
     key: str
-    value: str
+    value: dict

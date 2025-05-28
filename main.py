@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 from common.config import get_app_status
 from services.counter import CounterService
+from services.kafka import KafkaProducer
 from services.zookeeper import ZookeeperService
 from fastapi import FastAPI
 from common import utils
@@ -13,6 +14,7 @@ load_dotenv()
 
 zkService = ZookeeperService(os.getenv("BASE_PATH"))
 counterService = CounterService(zkService)
+kafkaProducer = KafkaProducer()
 
 from controllers.shortener_controller import router
 
@@ -23,8 +25,11 @@ async def lifespan(app: FastAPI):
     counterService.set_counter_attributes(node_path)
     app.state.counter_service = counterService
     app.state.zk_service = zkService
+    await kafkaProducer.start_producer()
+    app.state.kafka_producer = kafkaProducer
     yield
     logger.info("Server shutting down")
+    app.state.kafkaProducer.stop_producer()
     zkService.close_conn()
     logger.info("closing zookeeper conn")
 
