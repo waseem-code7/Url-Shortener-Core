@@ -28,7 +28,7 @@ class ZookeeperService:
     def create_new_node(self) -> str:
         try:
             if self.is_zookeeper_connected():
-                path = self.zkClient.create(path=self.base_path  + "/node-", ephemeral=False, sequence=True)
+                path = self.zkClient.create(path=self.base_path  + "/node-", ephemeral=True, sequence=True)
                 logger.info(f"Successfully created ephemeral sequential node at : {path}")
                 return path
         except NodeExistsError:
