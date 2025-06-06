@@ -39,7 +39,7 @@ class ShortUrlService:
             raise Exception("Failed to insert data to database")
 
         if os.getenv("ENVIRONMENT") == "dev":
-            short_url =  f"http://localhost:4002/{short_url_id}"
+            short_url =  f"http://localhost:4003/{short_url_id}"
         else:
             short_url =  os.getenv("DOMAIN") + f"/{short_url_id}"
 
