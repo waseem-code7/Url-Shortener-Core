@@ -10,9 +10,8 @@ from sessions.models.session_context import SessionContext
 
 
 class InMemorySessionManager(BaseSessionManager[T]):
-    def __init__(self, config: dict, max_sessions = 1000):
+    def __init__(self, config: dict):
         super().__init__(config)
-        self.max_sessions = max_sessions
         self._lock = Lock()
         self._sessions = Dict[str, str]
         self.connected = False
