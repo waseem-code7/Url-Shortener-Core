@@ -1,3 +1,4 @@
+import json
 from threading import Lock
 from typing import Union, Dict
 
@@ -8,27 +9,36 @@ from sessions.generics.session_generics import T
 from sessions.models.session_context import SessionContext
 
 
-class InMemorySessionManager(BaseSessionManager):
-    def __init__(self, config: dict, save_uninitialized: bool = False, max_sessions = 1000):
-        super().__init__(config, save_uninitialized)
+class InMemorySessionManager(BaseSessionManager[T]):
+    def __init__(self, config: dict, max_sessions = 1000):
+        super().__init__(config)
         self.max_sessions = max_sessions
         self._lock = Lock()
-        self._sessions = Dict[str, SessionContext[T]]
+        self._sessions = Dict[str, str]
+        self.connected = False
 
     def connect(self):
-        pass
+        self.connected = True
 
     def add(self, session_id: str, session_data: SessionContext[T]):
-        pass
+        with self._lock:
+            self._sessions[session_id] = json.dumps(session_data.session.__dict__)
 
     def destroy(self, session_id: str):
-        pass
+        with self._lock:
+            del self._sessions[session_id]
+
 
     def write_back(self, session_id: str, session_data: SessionContext[T]):
-        pass
+        with self._lock:
+            if session_id in self._sessions:
+                self._sessions[session_id] = json.dumps(session_data.session)
 
     def get_session(self, session_id: str) -> Union[None, SessionContext[T]]:
-        pass
+        if session_id in self._sessions:
+            session = self._sessions[session_id]
+            return SessionContext[T](session=session)
+        return None
 
     def verify(self, request: Request, session_id: str, session_data: SessionContext[T]) -> bool:
         pass

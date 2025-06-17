@@ -22,4 +22,8 @@ class Cookie:
     samesite: SameSite = SameSite.LAX
 
 class SessionContext(Generic[T]):
-    session_data: T
+    def __init__(self, session: T):
+        self.session = session
+
+    def get_session_context(self) -> T:
+        return self.session

@@ -8,10 +8,9 @@ from starlette.requests import Request
 
 class BaseSessionManager(ABC, Generic[T]):
 
-    def __init__(self, config: dict, save_uninitialized: bool = False):
+    def __init__(self, config: dict):
         self.is_connected: False
         self.config = config
-        self.save_uninitialized = save_uninitialized
 
     @abstractmethod
     def connect(self):
