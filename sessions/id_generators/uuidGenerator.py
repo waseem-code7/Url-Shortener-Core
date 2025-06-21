@@ -3,7 +3,7 @@ import uuid
 from sessions.id_generators.base import SessionIDGenerator
 
 
-class UUIDGenerator(SessionIDGenerator):
+class SecureRandomGenerator(SessionIDGenerator):
     """UUID-based session ID generator"""
 
     def generate(self) -> str:

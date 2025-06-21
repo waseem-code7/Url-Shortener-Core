@@ -1,7 +1,6 @@
 import asyncio
+import threading
 from datetime import datetime, timedelta
-from os.path import exists
-from threading import Thread
 from typing import Optional, Any, Dict
 
 from sessions.serializers.JSONSerializer import JSONSerializer
@@ -11,6 +10,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 class MemoryStore(SessionStore):
     """In-memory session store with TTL support"""
+    _instance = None
 
     def __init__(self, serializer: Optional[SessionSerializer] = None):
         self._sessions: Dict[str, Dict[str, Any]] = {}
@@ -20,6 +20,14 @@ class MemoryStore(SessionStore):
         self.debug = False
         self.cleanup_task = None
         self.start_cleanup()
+
+    def __new__(cls, *args, **kwargs):
+        with threading.Lock():
+            if cls._instance is None:
+                with threading.Lock():
+                    cls._instance = super().__new__(cls)
+            return cls._instance
+
 
 
     def _get_expired_sessions(self):
@@ -66,7 +74,7 @@ class MemoryStore(SessionStore):
         return None
 
     async def put(self, session_id: str, session_data: Dict[str, Any], ttl: Optional[int]) -> None:
-        if not exists(session_id):
+        if not self.exists(session_id):
             self._sessions[session_id] = session_data
             if ttl:
                 self._expiry[session_id] = datetime.now() + timedelta(seconds=ttl)
