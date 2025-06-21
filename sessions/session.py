@@ -6,6 +6,7 @@ class Session:
         self.data = data or {}
         self.is_new = is_new
         self.is_active = True
+        self.modified = False
 
     def __getitem__(self, item: str, default: any = None):
         if self.__contains__(item):
@@ -13,9 +14,11 @@ class Session:
         return default
 
     def __setitem__(self, key, value):
+        self.modified = True
         self.data[key] = value
 
     def __delitem__(self, key):
+        self.modified = True
         del self.data[key]
 
     def __contains__(self, item: str):

@@ -23,8 +23,8 @@ class SessionConfig:
     cookie_secure: bool = False
     cookie_httponly: bool = True
     cookie_samesite: str = "lax"
-    auto_save: bool = True
     rolling: bool = False  # Reset expiry on each request
+    increase_interval_on_touch: int = 10000 # applicable only is rolling is set to True
 
     def __post_init__(self):
         if self.store is None:
