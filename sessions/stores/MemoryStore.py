@@ -1,7 +1,7 @@
 import asyncio
 import threading
 from datetime import datetime, timedelta
-from typing import Optional, Any, Dict
+from typing import Optional, Any, Dict, Callable, Union
 
 from sessions.serializers.JSONSerializer import JSONSerializer
 from sessions.serializers.base import SessionSerializer
@@ -12,13 +12,14 @@ class MemoryStore(SessionStore):
     """In-memory session store with TTL support"""
     _instance = None
 
-    def __init__(self, serializer: Optional[SessionSerializer] = None):
-        self._sessions: Dict[str, Dict[str, Any]] = {}
+    def __init__(self, should_deleted_expired_sessions = True, async_cleanup_task = Union[None, Callable], expiration_loop_interval = 60, debug=False):
+        self._sessions: Dict[str, str] = {}
         self._expiry: Dict[str, datetime] = {}
-        self.serializer = serializer or JSONSerializer()
-        self.expiration_loop_interval = 60 # check of expired session every 60 sec
-        self.debug = False
-        self.cleanup_task = None
+
+        self.expiration_loop_interval = expiration_loop_interval # check of expired session every 60 sec
+        self.debug = debug
+        self.should_deleted_expired_sessions = should_deleted_expired_sessions
+        self.async_cleanup_task = async_cleanup_task
         self.start_cleanup()
 
     def __new__(cls, *args, **kwargs):
@@ -42,8 +43,8 @@ class MemoryStore(SessionStore):
         if self.debug:
             print("Starting session expiration loop")
 
-        if self.cleanup_task is None:
-            self.cleanup_task = asyncio.create_task(self._cleanup_expired_sessions())
+        if self.async_cleanup_task is None:
+            self.async_cleanup_task = asyncio.create_task(self._cleanup_expired_sessions())
 
 
     async def _cleanup_expired_sessions(self):
@@ -73,7 +74,7 @@ class MemoryStore(SessionStore):
             return self._sessions[session_id]
         return None
 
-    async def put(self, session_id: str, session_data: Dict[str, Any], ttl: Optional[int]) -> None:
+    async def put(self, session_id: str, session_data: str, ttl: Optional[int]) -> None:
         if not self.exists(session_id):
             self._sessions[session_id] = session_data
             if ttl:

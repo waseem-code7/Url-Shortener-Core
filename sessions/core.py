@@ -34,20 +34,20 @@ class SessionManager:
         if session_id:
             await self.config.store.delete(session_id)
 
-    async def touch_session(self, session_id: str, ttl_in_sec: int):
+    async def touch_session(self, session_id: str):
         """Increase session expiry time"""
 
         if session_id and self.config.rolling:
-            await self.config.store.touch(session_id, ttl_in_sec)
+            await self.config.store.touch(session_id, self.config.ttl_in_sec)
 
-    async def update_session(self, session: Session, ttl_in_sec: int):
+    async def update_session(self, session: Session):
         """Update session data"""
 
         session_id = session.session_id
         if session_id:
             updated_session_data = session.data
             serialized_data = self.config.serializer.serialize(updated_session_data)
-            await self.config.store.put(session_id, serialized_data, ttl_in_sec)
+            await self.config.store.put(session_id, serialized_data, self.config.ttl_in_sec)
 
 
     async def remove_inactive_session(self, session: Session):
