@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, Optional, Any
 
 
-class Session(ABC):
+class SessionStore(ABC):
     """Abstract base class for session storage"""
 
     @abstractmethod
