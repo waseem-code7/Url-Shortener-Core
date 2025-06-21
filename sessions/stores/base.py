@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Optional, Any
+from typing import Dict, Optional, Any, Union
 
 
 class SessionStore(ABC):
@@ -11,7 +11,7 @@ class SessionStore(ABC):
         pass
 
     @abstractmethod
-    async def put(self, session_id: str, session_data: Dict[str, Any], ttl: Optional[int]) -> None:
+    async def put(self, session_id: str, session_data: Union[Dict[str, Any], str], ttl: Optional[int]) -> None:
         """Store session data with optional TTL in seconds"""
         pass
 

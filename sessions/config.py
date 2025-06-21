@@ -15,6 +15,7 @@ class SessionConfig:
     store: SessionStore = None
     serializer: SessionSerializer = None
     id_generator: SessionIDGenerator = None
+    ttl_in_sec: int = 86400
     cookie_name: str = "session_id"
     cookie_max_age: Optional[int] = 86400  # 24 hours
     cookie_path: str = "/"
