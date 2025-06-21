@@ -16,7 +16,7 @@ class SessionStore(ABC):
         pass
 
     @abstractmethod
-    async def touch(self, session_id: str) -> None:
+    async def touch(self, session_id: str, ttl: int) -> None:
         """Update session expiration time"""
         pass
 
