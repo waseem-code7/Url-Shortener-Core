@@ -2,6 +2,7 @@ import os
 
 from services.counter import CounterService
 from services.zookeeper import ZookeeperService
+from sessions.config import SessionConfig
 
 
 def get_app_status(counter: CounterService, zk: ZookeeperService):
@@ -14,3 +15,6 @@ def get_app_status(counter: CounterService, zk: ZookeeperService):
         "zookeeper_connected": zk.is_zookeeper_connected()
     }
     return APP_INFO
+
+def get_session_config() -> SessionConfig:
+    return SessionConfig()

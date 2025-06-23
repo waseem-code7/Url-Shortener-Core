@@ -12,12 +12,12 @@ class MemoryStore(SessionStore):
     """In-memory session store with TTL support"""
     _instance = None
 
-    def __init__(self, should_deleted_expired_sessions = True, async_cleanup_task = Union[None, Callable], expiration_loop_interval = 60, debug=False):
+    def __init__(self, should_deleted_expired_sessions = True, async_cleanup_task: Union[None, Callable] = None, expiration_loop_interval = 60, debug=False):
         self._sessions: Dict[str, str] = {}
         self._expiry: Dict[str, datetime] = {}
 
         self.expiration_loop_interval = expiration_loop_interval # check of expired session every 60 sec
-        self.debug = debug
+        self.debug = True
         self.should_deleted_expired_sessions = should_deleted_expired_sessions
         self.async_cleanup_task = async_cleanup_task
         self.start_cleanup()
@@ -74,11 +74,12 @@ class MemoryStore(SessionStore):
             return self._sessions[session_id]
         return None
 
-    async def put(self, session_id: str, session_data: str, ttl: Optional[int]) -> None:
-        if not self.exists(session_id):
-            self._sessions[session_id] = session_data
-            if ttl:
-                self._expiry[session_id] = datetime.now() + timedelta(seconds=ttl)
+    async def put(self, session_id: str, session_data: str, is_new: bool, ttl: Optional[int]) -> None:
+        if session_id is None or len(session_id) == 0:
+            return
+        self._sessions[session_id] = session_data
+        if ttl and is_new:
+            self._expiry[session_id] = datetime.now() + timedelta(seconds=ttl)
 
     async def touch(self, session_id: str, ttl: int) -> None:
         if self.exists(session_id):
