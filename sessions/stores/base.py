@@ -11,7 +11,7 @@ class SessionStore(ABC):
         pass
 
     @abstractmethod
-    async def put(self, session_id: str, session_data: Union[Dict[str, Any], str], ttl: Optional[int]) -> None:
+    async def put(self, session_id: str, session_data: Union[Dict[str, Any], str], is_new: bool, ttl: Optional[int]) -> None:
         """Store session data with optional TTL in seconds"""
         pass
 
