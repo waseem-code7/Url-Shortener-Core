@@ -2,12 +2,15 @@ import os
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 
-from common.config import get_app_status
+from common.config import get_app_status, get_session_config
 from services.counter import CounterService
 from services.kafka import KafkaProducer
 from services.zookeeper import ZookeeperService
 from fastapi import FastAPI
 from common import utils
+from sessions.core import SessionManager
+from sessions.middleware import SessionMiddleware
+
 logger = utils.get_logger(__name__)
 
 load_dotenv()
@@ -15,8 +18,10 @@ load_dotenv()
 zkService = ZookeeperService(os.getenv("BASE_PATH"))
 counterService = CounterService(zkService)
 kafkaProducer = KafkaProducer()
+sessionManager = SessionManager(config=get_session_config())
 
-from controllers.shortener_controller import router
+from controllers.shortener_controller import router as shortener_router
+from controllers.auth import router as auth_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -34,7 +39,14 @@ async def lifespan(app: FastAPI):
     logger.info("closing zookeeper conn")
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(router)
+
+# Middleware
+
+app.add_middleware(SessionMiddleware, sessionManager)
+
+# Routers
+app.include_router(shortener_router)
+app.include_router(auth_router)
 
 @app.get("/health")
 async def health():
