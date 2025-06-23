@@ -24,8 +24,8 @@ class SessionManager:
             session = Session(session_id=session_id, data=deserialized_data, is_new=False)
 
         else:
-            session_id = await self.config.id_generator.generate()
-            await self.config.store.put(session_id=session_id, session_data=self.config.serializer.serialize({}), ttl=self.config.ttl_in_sec)
+            session_id = self.config.id_generator.generate()
+            await self.config.store.put(session_id=session_id, session_data=self.config.serializer.serialize({}), is_new=True, ttl=self.config.ttl_in_sec)
             session = Session(session_id=session_id, data={}, is_new=True)
 
         return session
@@ -44,12 +44,14 @@ class SessionManager:
 
     async def update_session(self, session: Session) -> None:
         """Update session data"""
+        if len(session) == 0 and self.config.save_uninitialized == False:
+            return
 
         session_id = session.session_id
         if session_id:
             updated_session_data = session.data
             serialized_data = self.config.serializer.serialize(updated_session_data)
-            await self.config.store.put(session_id=session_id, session_data=serialized_data, ttl=None)
+            await self.config.store.put(session_id=session_id, session_data=serialized_data, is_new=False, ttl=None)
             if self.config.rolling:
                 await self.touch_session(session_id)
 
@@ -62,6 +64,12 @@ class SessionManager:
         if session_id and not is_active_session:
             await self.config.store.delete(session_id)
 
+    def should_store_cookie(self, session: Session):
+        """Check if cookie can be stored in response"""
+
+        if self.config.save_uninitialized:
+            return True
+        return len(session) != 0
 
     def get_cookie_config(self, session_id):
         """Return the cookie config"""

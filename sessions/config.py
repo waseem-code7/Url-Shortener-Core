@@ -20,11 +20,12 @@ class SessionConfig:
     cookie_max_age: Optional[int] = 86400  # 24 hours
     cookie_path: str = "/"
     cookie_domain: Optional[str] = None
-    cookie_secure: bool = False
+    cookie_secure: bool = True
     cookie_httponly: bool = True
     cookie_samesite: str = "lax"
     rolling: bool = False  # Reset expiry on each request
     increase_interval_on_touch: int = 10000 # applicable only is rolling is set to True
+    save_uninitialized = False
 
     def __post_init__(self):
         if self.store is None:
