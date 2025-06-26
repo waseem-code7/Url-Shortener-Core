@@ -2,18 +2,14 @@ from fastapi import APIRouter, Request, Depends, HTTPException, Body, Background
 
 from dtos.RequestDTOs import CreateShortUrlRequest, UpdateShortUrlRequest
 from dtos.ResponseDTOs import UpdateShortUrlResponse, CreateShortUrlResponse
-from services.shortUrlService import ShortUrlService
-from services.shortener import Shortener
-from strategies.base62 import Base62Strategy
+from registries.registry import ServiceRegistry
+from services.short_url_service import ShortUrlService
 from starlette import status
 
 router = APIRouter()
 
 def get_short_url_service(request: Request) -> ShortUrlService:
-    counter_service = request.app.state.counter_service
-    shortener_service = Shortener(Base62Strategy())
-    kafka_producer = request.app.state.kafka_producer
-    return ShortUrlService(counter_service, shortener_service, kafka_producer)
+    return ServiceRegistry.get_registry("SHORTENER_URL_SERVICE", request.app)
 
 
 @router.post("/v1/shorturl", response_model=CreateShortUrlResponse, status_code=status.HTTP_201_CREATED)
