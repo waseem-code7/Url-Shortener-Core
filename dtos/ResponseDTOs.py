@@ -6,3 +6,5 @@ class CreateShortUrlResponse(BaseModel):
 class UpdateShortUrlResponse(BaseModel):
     short_url_id: str
     long_url: str
+
+

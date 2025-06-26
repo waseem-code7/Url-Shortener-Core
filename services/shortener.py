@@ -1,4 +1,4 @@
-from strategies.abstract_shortener import AbstractShortener
+from shortener_strategies.abstract_shortener import AbstractShortener
 
 
 class Shortener:

@@ -11,16 +11,16 @@ from common import utils
 from custom_types.custom_dict import KafkaProducerMessage
 from dtos.ResponseDTOs import CreateShortUrlResponse, UpdateShortUrlResponse
 
-logger = utils.get_logger("shortUrlService.py")
+logger = utils.get_logger("short_url_service.py")
 
 
 class ShortUrlService:
 
-    def __init__(self, counter_service: CounterService, shortener: Shortener, kafka_producer: KafkaProducer):
+    def __init__(self, counter_service: CounterService, shortener: Shortener, kafka_producer: KafkaProducer, shortener_repository: ShortenerRepository):
         self.counter_service = counter_service
         self.shortener = shortener
         self.kafka_producer = kafka_producer
-        self.shortener_repository = ShortenerRepository(os.getenv("DYNAMO_URL_TABLE_NAME"))
+        self.shortener_repository = shortener_repository
 
     def create_new_short_url(self, long_url):
         counter_val = self.counter_service.get_counter_value_safe(retries=2)

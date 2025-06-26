@@ -8,19 +8,28 @@ logger = get_logger(__name__)
 
 # Strict Singleton class
 class CounterService:
+    __instance = None
+    __lock = threading.Lock()
 
     def __new__(cls, *args, **kwargs):
-        if not hasattr(cls, "instance"):
-            cls.instance = super().__new__(cls)
-        return cls.instance
+        if cls.__instance is None:
+            with cls.__lock:
+                if cls.__instance is None:
+                    cls.__instance = super().__new__(cls)
+                    cls.__instance.__initialized = False
+        return cls.__instance
 
     def __init__(self, zkService: ZookeeperService):
+        if self.__initialized:
+            return
+
         self.range = int(os.getenv("COUNTER_RANGE"))
         self._start = 0
         self._end = 0
         self.current = 0
         self.zkService = zkService
         self.lock = threading.Lock()
+        self.__initialized = True
 
     def set_counter_attributes(self, node_path):
         node_sequence_number = int(node_path.split("-")[-1])
