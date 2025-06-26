@@ -10,10 +10,20 @@ logger = get_logger(__name__)
 
 
 class KafkaProducer:
-    _instance = None
-    _lock = threading.Lock()
+    __instance = None
+    __lock = threading.Lock()
+
+    def __new__(cls, *args, **kwargs):
+        if cls.__instance is None:
+            with cls.__lock:
+                if cls.__instance is None:
+                    cls.__instance = super.__new__(cls)
+                    cls.__instance.__initialized = False
+        return cls.__instance
 
     def __init__(self):
+        if self.__initialized:
+            return
         conf = {
             'bootstrap_servers': os.getenv("KAFKA_BROKERS"),
             'client_id': socket.gethostname(),
@@ -22,19 +32,13 @@ class KafkaProducer:
             'retry_backoff_ms': 500,
         }
         self.producer = aiokafka.AIOKafkaProducer(**conf)
+        self.__initialized = True
         logger.info("Successfully initialized kafka brokers")
 
     async def start_producer(self):
         logger.info("Attempting to start kafka producer")
         await self.producer.start()
         logger.info("Successfully started kafka producer")
-
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            with cls._lock:
-                if cls._instance is None:
-                    cls._instance = super().__new__(cls)
-        return cls._instance
 
     def stop_producer(self):
         self.producer.stop()

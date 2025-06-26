@@ -1,5 +1,3 @@
-import os
-
 import common.utils
 from repository.dynamoDBClient import DynamoDBClient
 logger = common.utils.get_logger("ShortenerRepository")
@@ -13,7 +11,7 @@ class ShortenerRepository(DynamoDBClient):
     def put_item_to_table(self, pk, data: dict, return_values="ALL_OLD"):
         try:
             attributes: dict = {
-                os.getenv("DYNAMO_URL_TABLE_PK", default="short_url_id"): pk
+                "short_url_id": pk
             }
             attributes.update(data)
 
@@ -25,7 +23,7 @@ class ShortenerRepository(DynamoDBClient):
     def update_param_in_record(self, pk, param_key, param_value, return_values="UPDATED_NEW"):
         try:
             key_attributes = {
-                os.getenv("DYNAMO_URL_TABLE_PK", default="short_url_id"): pk
+                "short_url_id": pk
             }
             result = self.update_param(key_attributes, param_key, param_value, return_values)
             return result
@@ -35,7 +33,7 @@ class ShortenerRepository(DynamoDBClient):
     def delete_record_from_table(self, pk, return_values="NONE"):
         try:
             key_attributes = {
-                os.getenv("DYNAMO_URL_TABLE_PK", default="short_url_id"): pk
+                "short_url_id": pk
             }
             return self.delete_record(key_attributes, return_values)
         except Exception as e:
@@ -45,7 +43,7 @@ class ShortenerRepository(DynamoDBClient):
     def get_item_from_table(self, pk):
         try:
             key_attributes = {
-                os.getenv("DYNAMO_URL_TABLE_PK", default="short_url_id"): pk
+                "short_url_id": pk
             }
             return self.get_item(key_attributes)
         except Exception as e:
