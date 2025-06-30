@@ -1,4 +1,4 @@
-from typing_extensions import Optional
+from typing_extensions import Optional, Literal
 
 from sessions.config import SessionConfig
 from sessions.session import Session
@@ -63,6 +63,9 @@ class SessionManager:
 
         if session_id and not is_active_session:
             await self.config.store.delete(session_id)
+            return True
+
+        return False
 
     def should_store_cookie(self, session: Session):
         """Check if cookie can be stored in response"""
@@ -71,16 +74,26 @@ class SessionManager:
             return True
         return len(session) != 0
 
-    def get_cookie_config(self, session_id):
+    def get_cookie_config(self, session_id, request_type: Literal["CREATE", "DELETE"]):
         """Return the cookie config"""
 
-        return {
-            "key": "session_id",
-            "value": session_id,
-            "max_age": self.config.cookie_max_age,
-            "path": self.config.cookie_path,
-            "domain": self.config.cookie_domain,
-            "secure": self.config.cookie_secure,
-            "httponly": self.config.cookie_httponly,
-            "samesite": self.config.cookie_samesite
-        }
+        if request_type == "CREATE":
+            return {
+                "key": "session_id",
+                "value": session_id,
+                "max_age": self.config.cookie_max_age,
+                "path": self.config.cookie_path,
+                "domain": self.config.cookie_domain,
+                "secure": self.config.cookie_secure,
+                "httponly": self.config.cookie_httponly,
+                "samesite": self.config.cookie_samesite
+            }
+        else:
+            return {
+                "key": "session_id",
+                "path": self.config.cookie_path,
+                "domain": self.config.cookie_domain,
+                "secure": self.config.cookie_secure,
+                "httponly": self.config.cookie_httponly,
+                "samesite": self.config.cookie_samesite
+            }

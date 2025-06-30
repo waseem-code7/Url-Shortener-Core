@@ -1,7 +1,7 @@
 import bcrypt
 salt_rounds = 10
 from repository.user import UserRepository
-
+import common.utils as utils
 
 class AuthService:
 
@@ -9,7 +9,9 @@ class AuthService:
         self.user_repository = user_repository
 
     def _verify_password(self, input_password, hashed_password):
-        if bcrypt.checkpw(input_password, hashed_password):
+        hashed_password_encoded = utils.convert_to_bytes(hashed_password)
+        input_password_encoded = utils.convert_to_bytes(input_password)
+        if bcrypt.checkpw(input_password_encoded, hashed_password_encoded):
             return True
         return False
 
@@ -19,10 +21,10 @@ class AuthService:
         if user.get("ResponseMetadata").get("HTTPStatusCode") != 200:
             raise Exception("Error occurred while fetching data from DB")
 
-        if user.get("Attributes", None) is None:
+        if user.get("Item", None) is None:
             return None
 
-        return user.get("Attributes")
+        return user.get("Item")
 
     def verify_credentials(self, email_id, password):
         user = self.get_user(email_id)

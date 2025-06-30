@@ -13,8 +13,12 @@ class SessionMiddleware(BaseHTTPMiddleware):
 
 
     def set_cookie_in_response(self, session_id: str, response: Response):
-        cookie_conf = self.session_manager.get_cookie_config(session_id)
+        cookie_conf = self.session_manager.get_cookie_config(session_id, "CREATE")
         response.set_cookie(**cookie_conf)
+
+    def remove_cookie_from_response(self, session_id: str, response: Response):
+        cookie_conf = self.session_manager.get_cookie_config(session_id, "DELETE")
+        response.delete_cookie(**cookie_conf)
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
 
@@ -29,6 +33,8 @@ class SessionMiddleware(BaseHTTPMiddleware):
                 self.set_cookie_in_response(session.session_id, response)
             await self.session_manager.update_session(session)
 
-        await self.session_manager.remove_inactive_session(session)
+        remove_cookie = await self.session_manager.remove_inactive_session(session)
+        if remove_cookie:
+            self.remove_cookie_from_response(session_id, response)
 
         return response

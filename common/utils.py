@@ -10,3 +10,15 @@ def stringify(d: dict) -> str:
         return json.dumps(d)
     except Exception as e:
         return ""
+
+def convert_to_bytes(s: str):
+    try:
+        return s.encode("utf-8")
+    except:
+        return None
+
+def convert_to_string(s: bytes):
+    try:
+        return s.decode("utf-8")
+    except:
+        return None

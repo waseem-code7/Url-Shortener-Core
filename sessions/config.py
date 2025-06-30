@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Literal, Union
 
 from sessions.id_generators.base import SessionIDGenerator
 from sessions.id_generators.uuidGenerator import SecureRandomGenerator
@@ -22,7 +22,7 @@ class SessionConfig:
     cookie_domain: Optional[str] = None
     cookie_secure: bool = True
     cookie_httponly: bool = True
-    cookie_samesite: str = "lax"
+    cookie_samesite: Union[Literal["lax", "strict", "none"], None] = "lax"
     rolling: bool = False  # Reset expiry on each request
     increase_interval_on_touch: int = 10000 # applicable only is rolling is set to True
     save_uninitialized = False
