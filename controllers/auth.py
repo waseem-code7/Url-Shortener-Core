@@ -31,7 +31,7 @@ def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends(),  a
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail=str(e))
 
 @router.post("/v1/logout", status_code=status.HTTP_200_OK, dependencies=[Depends(Authorization.requires_login)])
-def login(request: Request):
+def logout(request: Request):
     try:
         session: Session = request.state.session
         session.destroy()
