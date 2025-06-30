@@ -1,10 +1,7 @@
 import asyncio
 import threading
 from datetime import datetime, timedelta
-from typing import Optional, Any, Dict, Callable, Union
-
-from sessions.serializers.JSONSerializer import JSONSerializer
-from sessions.serializers.base import SessionSerializer
+from typing import Optional, Dict, Callable, Union
 from sessions.stores.base import SessionStore
 from concurrent.futures import ThreadPoolExecutor
 
@@ -70,7 +67,7 @@ class MemoryStore(SessionStore):
                 break
 
     async def get(self, session_id: str):
-        if self.exists(session_id):
+        if await self.exists(session_id):
             return self._sessions[session_id]
         return None
 
@@ -86,7 +83,7 @@ class MemoryStore(SessionStore):
             self._expiry[session_id] = datetime.now() + timedelta(seconds=ttl)
 
     async def delete(self, session_id: str) -> None:
-        if self.exists(session_id):
+        if await self.exists(session_id):
             del self._sessions[session_id]
             del self._expiry[session_id]
 
