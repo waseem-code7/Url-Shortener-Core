@@ -22,6 +22,7 @@ sessionManager = SessionManager(config=get_session_config())
 
 from controllers.shortener_controller import router as shortener_router
 from controllers.auth import router as auth_router
+from controllers.user import router as user_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -47,6 +48,7 @@ app.add_middleware(SessionMiddleware, sessionManager)
 # Routers
 app.include_router(shortener_router)
 app.include_router(auth_router)
+app.include_router(user_router)
 
 @app.get("/health")
 async def health():
