@@ -46,9 +46,9 @@ app = FastAPI(lifespan=lifespan)
 app.add_middleware(SessionMiddleware, sessionManager)
 
 # Routers
-app.include_router(shortener_router)
 app.include_router(auth_router)
 app.include_router(user_router)
+app.include_router(shortener_router)
 
 @app.get("/health")
 async def health():
