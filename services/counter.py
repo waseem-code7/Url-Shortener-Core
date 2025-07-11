@@ -28,7 +28,6 @@ class CounterService:
         self._end = 0
         self.current = 0
         self.zkService = zkService
-        self.lock = threading.Lock()
         self.__initialized = True
 
     def set_counter_attributes(self, node_path):
@@ -51,7 +50,7 @@ class CounterService:
             raise Exception("Unable to increment counter")
 
         # critical section
-        with self.lock:
+        with self.__lock:
             value = self.current + 1
 
             if value < self._end:
@@ -62,6 +61,3 @@ class CounterService:
             path = self.zkService.create_new_node()
             self.set_counter_attributes(path)
             return self.get_counter_value_safe(retries - 1)
-
-
-
