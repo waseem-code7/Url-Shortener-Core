@@ -8,24 +8,30 @@ from concurrent.futures import ThreadPoolExecutor
 class MemoryStore(SessionStore):
     """In-memory session store with TTL support"""
     _instance = None
+    _lock = threading.Lock()
 
-    def __init__(self, should_deleted_expired_sessions = True, async_cleanup_task: Union[None, Callable] = None, expiration_loop_interval = 60, debug=False):
+    def __init__(self, should_delete_expired_sessions = True, async_cleanup_task: Union[None, Callable] = None, expiration_loop_interval = 60, debug=False):
+        if self._initialized:
+            return
+
         self._sessions: Dict[str, str] = {}
         self._expiry: Dict[str, datetime] = {}
 
         self.expiration_loop_interval = expiration_loop_interval # check of expired session every 60 sec
         self.debug = True
-        self.should_deleted_expired_sessions = should_deleted_expired_sessions
+        self.should_delete_expired_sessions = should_delete_expired_sessions
         self.async_cleanup_task = async_cleanup_task
         self.start_cleanup()
+        self._initialized = True
+
 
     def __new__(cls, *args, **kwargs):
-        with threading.Lock():
-            if cls._instance is None:
-                with threading.Lock():
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:
                     cls._instance = super().__new__(cls)
-            return cls._instance
-
+                    cls._initialized = False
+        return cls._instance
 
 
     def _get_expired_sessions(self):
@@ -40,7 +46,7 @@ class MemoryStore(SessionStore):
         if self.debug:
             print("Starting session expiration loop")
 
-        if self.async_cleanup_task is None:
+        if self.async_cleanup_task is None and self.should_delete_expired_sessions:
             self.async_cleanup_task = asyncio.create_task(self._cleanup_expired_sessions())
 
 
