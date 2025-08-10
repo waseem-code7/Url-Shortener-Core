@@ -34,5 +34,3 @@ Create the following tables in DynamoDB:
    pip install -r requirements.txt
    uvicorn main:app --reload
 
-
-
