@@ -37,10 +37,10 @@ class SessionManager:
             await self.config.store.delete(session_id)
 
     async def touch_session(self, session_id: str):
-        """Increase session expiry time"""
+        """Reset session expiry time"""
 
         if session_id:
-            await self.config.store.touch(session_id, self.config.increase_interval_on_touch)
+            await self.config.store.touch(session_id, self.config.reset_interval_on_touch)
 
     async def update_session(self, session: Session) -> None:
         """Update session data"""
