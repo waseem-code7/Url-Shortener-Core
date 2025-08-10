@@ -24,7 +24,7 @@ class SessionConfig:
     cookie_httponly: bool = True
     cookie_samesite: Union[Literal["lax", "strict", "none"], None] = "lax"
     rolling: bool = False  # Reset expiry on each request
-    increase_interval_on_touch: int = 10000 # applicable only is rolling is set to True
+    reset_interval_on_touch: int = 10000 # applicable only is rolling is set to True
     save_uninitialized = False
 
     def __post_init__(self):
