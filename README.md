@@ -33,6 +33,6 @@ Create the following tables in DynamoDB:
    cd Url-Shortener-Core
    pip install -r requirements.txt
    uvicorn main:app --reload
-  ```
+
 
 
